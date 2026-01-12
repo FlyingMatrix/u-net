@@ -51,7 +51,7 @@ class UNet(nn.Module):
         # Bottle neck
         x = self.bottleneck(x)
 
-        # Reverse skip_connection after bottle neck part
+        # Reverse skip_connection after bottle neck
         skip_connections = skip_connections[::-1]
 
         # Up part

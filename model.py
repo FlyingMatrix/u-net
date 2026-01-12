@@ -71,7 +71,7 @@ class UNet(nn.Module):
         return output
 
 def test():
-    input = torch.randn(size=(6, 1, 572, 572)) # (N, C, H, W)
+    input = torch.randn(size=(6, 1, 573, 573)) # (N, C, H, W)
     unet = UNet(in_channels=1, out_channels=1, features=[64, 128, 256, 512])
     output = unet(input)
     print(">>> Input shape: " + str(input.shape))

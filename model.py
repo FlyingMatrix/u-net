@@ -17,3 +17,5 @@ class DoubleConv(nn.Module):
     def forward(self, x): 
         return self.conv(x)
     
+class UNet(nn.Module):
+    pass

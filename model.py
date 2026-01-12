@@ -40,5 +40,32 @@ class UNet(nn.Module):
             self.ups.append(DoubleConv(in_channels=feature*2, out_channels=feature))
 
     def forward(self, x):
-        pass
-    
+        skip_connections = []
+
+        # Down part
+        for down in self.downs:
+            x = down(x)
+            skip_connections.append(x)
+            x = self.pool(x)
+
+        # Bottle neck
+        x = self.bottleneck(x)
+
+        # Reverse skip_connection after bottle neck part
+        skip_connections = skip_connections[::-1]
+
+        # Up part
+        for idx in range(0, len(self.ups), 2):
+            x = self.ups[idx](x)
+            skip_connection = skip_connections[idx//2]
+
+            if x.shape != skip_connection.shape:
+                x = F.resize(img=x, size=skip_connection.shape[2:]) # (H, W)
+            
+            concat = torch.cat(tensors=(skip_connection, x), dim=1) # (C)
+            x = self.ups[idx+1](concat)
+
+        # Final conv
+        output = self.final_conv(x)
+
+        return output

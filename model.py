@@ -18,4 +18,6 @@ class DoubleConv(nn.Module):
         return self.conv(x)
     
 class UNet(nn.Module):
-    pass
+    def __init__(self, in_channels=3, out_channels=1, features=[64, 128, 256, 512]):
+        super(UNet, self).__init__()
+        

@@ -4,8 +4,8 @@ from albumentations.pytorch import ToTensorV2
 from tqdm import tqdm
 import torch.nn as nn
 import torch.optim as optim
-from model import UNET
-from utils import load_checkpoint, save_checkpoint, get_loaders, check_accuracy, save_predictions_as_imgs
+from model import UNet
+from utils import load_checkpoint, save_checkpoint, get_loaders, save_predictions_as_imgs
 
 # Hyperparameters
 LEARNING_RATE = 1e-4
@@ -58,11 +58,15 @@ def data_prep():
         PIN_MEMORY
     )
 
-
+    return train_loader, val_loader
 
 # Train loop
 def train():
-    pass
+    train_loader, val_loader = data_prep()
+    model = UNet(in_channels=1, out_channels=1).to(DEVICE)
+    loss = nn.BCEWithLogitsLoss() # nn.BCEWithLogitsLoss() combines sigmoid() and nn.BCELoss(), which is more numerically stable
+    
+
 
 if __name__ == "__main__":
     train()

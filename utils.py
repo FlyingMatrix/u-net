@@ -34,14 +34,10 @@ def get_loaders(
 
     return train_loader, val_loader
 
-def save_checkpoint():
-    pass
+def save_checkpoint(state, filename="checkpoint.pth.tar"):
+    print(">>> Saving checkpoint...")
+    torch.save(state, filename)
 
-def load_checkpoint():
-    pass
- 
-def check_accuracy():
-    pass
-
-def save_predictions_as_imgs():
-    pass
+def load_checkpoint(checkpoint, model):
+    print(">>> Loading checkpoint...")
+    model.load_state_dict(checkpoint['state_dict'])    

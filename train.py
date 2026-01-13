@@ -5,13 +5,7 @@ from tqdm import tqdm
 import torch.nn as nn
 import torch.optim as optim
 from model import UNET
-from utils import (
-    load_checkpoint,
-    save_checkpoint,
-    get_loaders,
-    check_accuracy,
-    save_predictions_as_imgs,
-)
+from utils import load_checkpoint, save_checkpoint, get_loaders, check_accuracy, save_predictions_as_imgs
 
 # Hyperparameters
 LEARNING_RATE = 1e-4
@@ -63,7 +57,7 @@ def data_prep():
         NUM_WORKERS,
         PIN_MEMORY
     )
-    
+
 
 
 # Train loop

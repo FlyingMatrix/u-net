@@ -34,3 +34,14 @@ def get_loaders(
 
     return train_loader, val_loader
 
+def save_checkpoint():
+    pass
+
+def load_checkpoint():
+    pass
+ 
+def check_accuracy():
+    pass
+
+def save_predictions_as_imgs():
+    pass

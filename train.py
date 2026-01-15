@@ -33,6 +33,7 @@ def data_prep():
         A.Normalize(                
             mean=(0.5,),
             std=(0.5,),
+            max_pixel_value=255.0
         ), 
         ToTensorV2() # HWC -> CHW, numpy -> torch.Tensor, output dtype: float32
     ])
@@ -42,6 +43,7 @@ def data_prep():
         A.Normalize(
             mean=(0.5,),
             std=(0.5,),
+            max_pixel_value=255.0
         ),
         ToTensorV2()
     ])
@@ -62,12 +64,44 @@ def data_prep():
 
 # Train loop
 def train():
-    train_loader, val_loader = data_prep()
     model = UNet(in_channels=1, out_channels=1).to(DEVICE)
     loss = nn.BCEWithLogitsLoss() 
-    # nn.BCEWithLogitsLoss = sigmoid + BCE in a single, numerically stable function
-    # Input = logits instead of probabilities, widely used in binary classification and binary segmentation
-    
+    """
+        nn.BCEWithLogitsLoss = sigmoid + BCE in a single, numerically stable function
+        Input = logits instead of probabilities, widely used in binary classification and binary segmentation
+    """
+    optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
+    scaler = torch.amp.GradScaler("cuda")
+    """
+        GradScaler helps prevent underflow (gradients can become 0) when training with mixed precision on GPUs by:
+        - Scaling the loss before backpropagation
+        - Unscaling gradients before the optimizer step
+        - Skipping optimizer steps if gradients contain NaNs/Infs
+
+        Mixed precision means using more than one numeric precision during training. Usually:
+        - FP32 (float32) -> for stability
+        - FP16 (float16) or BF16 -> for speed & memory
+    """
+
+    train_loader, val_loader = data_prep()
+
+    if LOAD_MODEL:
+        load_checkpoint(torch.load("checkpoint.pth.tar"), model)
+
+    for epoch in range(NUM_EPOCHS):
+         # train the model
+        model.train()
+        train_loader = tqdm(train_loader)
+        for img, mask in train_loader:
+            img = img.to(DEVICE) # img.shape => (N, C=1, H, W)
+            mask = mask.float().unsqueeze(1).to(DEVICE) # mask.shape -> (N, H, W) -> (N, 1, H, W)
+            
+
+
+
+    with torch.amp.autocast(device_type="cuda"):
+        pass
+
 
 
 

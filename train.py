@@ -64,8 +64,12 @@ def data_prep():
 def train():
     train_loader, val_loader = data_prep()
     model = UNet(in_channels=1, out_channels=1).to(DEVICE)
-    loss = nn.BCEWithLogitsLoss() # nn.BCEWithLogitsLoss() combines sigmoid() and nn.BCELoss(), which is more numerically stable
+    loss = nn.BCEWithLogitsLoss() 
+    # nn.BCEWithLogitsLoss = sigmoid + BCE in a single, numerically stable function
+    # Input = logits instead of probabilities, widely used in binary classification and binary segmentation
     
+
+
 
 
 if __name__ == "__main__":

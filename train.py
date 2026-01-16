@@ -65,7 +65,7 @@ def data_prep():
 # Train loop
 def train():
     model = UNet(in_channels=1, out_channels=1).to(DEVICE)
-    loss = nn.BCEWithLogitsLoss() 
+    loss_fn = nn.BCEWithLogitsLoss() 
     """
         nn.BCEWithLogitsLoss = sigmoid + BCE in a single, numerically stable function
         Input = logits instead of probabilities, widely used in binary classification and binary segmentation
@@ -89,20 +89,35 @@ def train():
         load_checkpoint(torch.load("checkpoint.pth.tar"), model)
 
     for epoch in range(NUM_EPOCHS):
-         # train the model
+        # train the model
         model.train()
         train_loader = tqdm(train_loader)
-        for img, mask in train_loader:
-            img = img.to(DEVICE) # img.shape => (N, C=1, H, W)
-            mask = mask.float().unsqueeze(1).to(DEVICE) # mask.shape -> (N, H, W) -> (N, 1, H, W)
-            
+        for imgs, masks in train_loader:
+            imgs = imgs.to(DEVICE) # img.shape => (N, C=1, H, W)
+            masks = masks.float().unsqueeze(1).to(DEVICE) # mask.shape -> (N, H, W) -> (N, 1, H, W)
+            # forward
+            with torch.amp.autocast(device_type="cuda"):
+                predictions = model(imgs)
+                loss = loss_fn(predictions, masks)
+            # backward
+            optimizer.zero_grad()               # clear old gradients
+            scaler.scale(loss).backward()       # scale the loss, then backpropagate
+            scaler.step(optimizer)              # unscale gradients and update weights (safely)
+            scaler.update()                     # adjust the scaling factor dynamically
+            # update tqdm progress bar with current training loss
+            train_loader.set_postfix(loss=loss.item())
 
+        # save the model
+        checkpoint = {
+            "epoch": epoch,
+            "state_dict": model.state_dict(),
+            "optimizer": optimizer.state_dict()
+        }
+        save_checkpoint(checkpoint)
 
-
-    with torch.amp.autocast(device_type="cuda"):
-        pass
-
-
+        # validation
+        model.eval()
+        
 
 
 

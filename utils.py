@@ -34,9 +34,17 @@ def get_loaders(
 
     return train_loader, val_loader
 
-def save_checkpoint(state, filename="checkpoint.pth.tar"):
+def save_checkpoint(state, filename="checkpoint.pth.tar"): 
     print(">>> Saving checkpoint...")
     torch.save(state, filename)
+    """"
+        state is a dictionary that contains everything needed to resume training later, for example:
+        state = {
+            "epoch": epoch,
+            "state_dict": model.state_dict(),
+            "optimizer": optimizer.state_dict(),
+        }
+    """
 
 def load_checkpoint(checkpoint, model):
     print(">>> Loading checkpoint...")

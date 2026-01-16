@@ -1,3 +1,4 @@
-# Ignore everything inside data and .vscode
+# Ignore everything inside the following folders
 data/**
 .vscode/**
+__pycache__/**

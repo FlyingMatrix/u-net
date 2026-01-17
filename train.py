@@ -30,6 +30,11 @@ def data_prep():
         A.HorizontalFlip(p=0.5),
         # Single-channel normalization: mean=(0.5,), std=(0.5,) is used to zero-center grayscale images 
         # ... and scale them to roughly [-1, 1], which improves neural network training stability.
+
+        # A.Normalize (and most other intensity transforms) only apply to the image field, not mask.
+        # Thus, after the pipeline:
+        # - Image -> [-1, 1] (float, normalized)
+        # - Mask -> {0, 1} 
         A.Normalize(                
             mean=(0.5,),
             std=(0.5,),
@@ -117,7 +122,7 @@ def train():
 
         # validation
         model.eval()
-
+        
 
 
 

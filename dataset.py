@@ -38,6 +38,11 @@ class UNetDataset(Dataset):
         image = np.array(Image.open(img_path).convert("L"))
         mask = np.array(Image.open(mask_path).convert("L"))
 
+        # Convert mask value from {0, 255} to {0, 1}, since:
+        # - UNet output (sigmoid) -> [0, 1]
+        # - Loss function (BCE / Dice) expects {0, 1} labels, not 255
+        mask = (mask > 0).astype(np.float32)
+
         if self.transform is not None:
             augmentations = self.transform(image=image, mask=mask) # Albumentations transform
             image = augmentations['image']

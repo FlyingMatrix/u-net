@@ -2,6 +2,7 @@ import torch
 import torchvision
 from dataset import UNetDataset
 from torch.utils.data import DataLoader
+import os
 
 def get_loaders(
     train_img_dir, 
@@ -49,3 +50,27 @@ def save_checkpoint(state, filename="checkpoint.pth.tar"):
 def load_checkpoint(checkpoint, model):
     print(">>> Loading checkpoint...")
     model.load_state_dict(checkpoint['state_dict'])    
+
+def save_predictions_as_images(dataloader, model, folder, device):
+    model.eval()
+    pred_dir = os.path.join(folder, "predictions")
+    gt_dir = os.path.join(folder, "groundtruth_masks")
+    os.makedirs(pred_dir, exist_ok=True)
+    os.makedirs(gt_dir, exist_ok=True)
+
+    for idx, (imgs, masks) in enumerate(dataloader):
+        imgs = imgs.to(device)
+        masks = masks.to(device)
+        with torch.no_grad():
+            probabilities = torch.sigmoid(model(imgs))
+            predictions = (probabilities > 0.5).float()  # (N, 1, H, W)
+        # save each image in the batch
+        for pred in range(predictions.size(0)):
+            torchvision.utils.save_image(
+                predictions[pred],
+                os.path.join(pred_dir, f"{idx}_{pred}.png")
+            )
+            torchvision.utils.save_image(
+                masks[pred].unsqueeze(0),
+                os.path.join(gt_dir, f"{idx}_{pred}.png")
+            )

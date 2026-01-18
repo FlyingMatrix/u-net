@@ -5,11 +5,12 @@ from tqdm import tqdm
 import torch.nn as nn
 import torch.optim as optim
 from model import UNet
-from utils import load_checkpoint, save_checkpoint, get_loaders
+from utils import load_checkpoint, save_checkpoint, get_loaders, save_predictions_as_images
 
 # Hyperparameters
 LEARNING_RATE = 1e-4
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+SAVE_PATH = "saved_images"
 BATCH_SIZE = 5
 NUM_EPOCHS = 10
 NUM_WORKERS = 2
@@ -93,6 +94,8 @@ def train():
     if LOAD_MODEL:
         load_checkpoint(torch.load("checkpoint.pth.tar"), model)
 
+    print(">>> ============ Model training is started... ============")
+
     for epoch in range(NUM_EPOCHS):
         # train the model
         model.train()
@@ -139,7 +142,8 @@ def train():
             print(f">>> Accuracy: {num_correct / num_pixels * 100:.2f}%")
             print(f">>> Dice score: {dice_score / len(val_loader)}")
                 
+        # save predicted images
+        save_predictions_as_images(dataloader=val_loader, model=model, folder=SAVE_PATH, device=DEVICE)
+        print(">>> ======================================================")
 
-
-if __name__ == "__main__":
-    train()
+    print(">>> ================ Training is finished ================")

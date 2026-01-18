@@ -2,3 +2,5 @@
 data/**
 .vscode/**
 __pycache__/**
+checkpoint.pth.tar
+saved_images/**

@@ -38,7 +38,7 @@ class UNetDataset(Dataset):
         image = np.array(Image.open(img_path).convert("L"))
         mask = np.array(Image.open(mask_path).convert("L"))
 
-        # Convert mask value from {0, 255} to {0, 1}, since:
+        # Convert mask value from {0, 255} ({black, white}) to {0, 1}, since:
         # - UNet output (sigmoid) -> [0, 1]
         # - Loss function (BCE / Dice) expects {0, 1} labels, not 255
         mask = (mask > 0).astype(np.float32)

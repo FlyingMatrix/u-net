@@ -133,7 +133,11 @@ def train():
                 probabilities = torch.sigmoid(model(imgs)) # probabilities.shape -> (N, 1, H, W), torch.sigmoid() converts logits into values in (0, 1)
                 predictions = (probabilities > 0.5).float()
                 num_correct += (predictions == masks).sum()
-                num_pixels += torch.numel(predictions) # torch.numel() returns the total number of elements in the tensor predictions
+                num_pixels += torch.numel(predictions) # torch.numel() returns the total number of elements in the tensor predictions: N*1*H*W
+                dice_score += (2 * (predictions * masks).sum()) / ((predictions + masks).sum() + 1e-8)
+
+            print(f">>> Accuracy: {num_correct / num_pixels * 100:.2f}%")
+            print(f">>> Dice score: {dice_score / len(val_loader)}")
                 
 
 

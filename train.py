@@ -98,11 +98,11 @@ def train():
         model.train()
         train_loader = tqdm(train_loader)
         for imgs, masks in train_loader:
-            imgs = imgs.to(DEVICE) # img.shape => (N, C=1, H, W)
-            masks = masks.float().unsqueeze(1).to(DEVICE) # mask.shape -> (N, H, W) -> (N, 1, H, W)
+            imgs = imgs.to(DEVICE) # img.shape -> (N, 1, H, W)
+            masks = masks.unsqueeze(1).to(DEVICE) # mask.shape -> (N, H, W) -> (N, 1, H, W)
             # forward
             with torch.amp.autocast(device_type="cuda"):
-                predictions = model(imgs)
+                predictions = model(imgs) # predictions.shape -> (N, 1, H, W)
                 loss = loss_fn(predictions, masks)
             # backward
             optimizer.zero_grad()               # clear old gradients
@@ -122,8 +122,19 @@ def train():
 
         # validation
         model.eval()
-        
+        num_correct = 0
+        num_pixels = 0
+        dice_score = 0
 
+        with torch.no_grad():
+            for imgs, masks in val_loader:
+                imgs = imgs.to(DEVICE) # img.shape -> (N, 1, H, W)
+                masks = masks.unsqueeze(1).to(DEVICE) # mask.shape -> (N, H, W) -> (N, 1, H, W)
+                probabilities = torch.sigmoid(model(imgs)) # probabilities.shape -> (N, 1, H, W), torch.sigmoid() converts logits into values in (0, 1)
+                predictions = (probabilities > 0.5).float()
+                num_correct += (predictions == masks).sum()
+                num_pixels += torch.numel(predictions) # torch.numel() returns the total number of elements in the tensor predictions
+                
 
 
 if __name__ == "__main__":

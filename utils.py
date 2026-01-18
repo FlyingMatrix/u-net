@@ -51,7 +51,7 @@ def load_checkpoint(checkpoint, model):
     print(">>> Loading checkpoint...")
     model.load_state_dict(checkpoint['state_dict'])    
 
-def save_predictions_as_images(dataloader, model, folder, device):
+def save_predictions_as_images(dataloader, model, folder="./saved_images", device="cuda" if torch.cuda.is_available() else "cpu"):
     model.eval()
     pred_dir = os.path.join(folder, "predictions")
     gt_dir = os.path.join(folder, "groundtruth_masks")

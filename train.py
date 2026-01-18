@@ -10,7 +10,6 @@ from utils import load_checkpoint, save_checkpoint, get_loaders, save_prediction
 # Hyperparameters
 LEARNING_RATE = 1e-4
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
-SAVE_PATH = "saved_images"
 BATCH_SIZE = 5
 NUM_EPOCHS = 10
 NUM_WORKERS = 2
@@ -143,7 +142,7 @@ def train():
             print(f">>> Dice score: {dice_score / len(val_loader)}")
                 
         # save predicted images
-        save_predictions_as_images(dataloader=val_loader, model=model, folder=SAVE_PATH, device=DEVICE)
+        save_predictions_as_images(dataloader=val_loader, model=model, device=DEVICE)
         print(">>> ======================================================")
 
     print(">>> ================ Training is finished ================")
